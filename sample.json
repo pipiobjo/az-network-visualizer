@@ -1,0 +1,97 @@
+{
+  "count": 10,
+  "data": [
+    {
+      "SubnetRange": "10.0.0.0/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-connect-prod-neu-pdy-firewall",
+      "routeNextHopIpAddress": null,
+      "routeNextHopType": "Internet"
+    },
+    {
+      "SubnetRange": "10.0.1.32/27",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "10.0.129.0/24",
+      "routeName": "rt-connect-prod-neu-pdy-gateway",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.0.128/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "10.0.129.0/24",
+      "routeName": "rt-connect-prod-neu-pdy-shared-services",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.0.128/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-connect-prod-neu-pdy-shared-services",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.0.128/26",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.1.32/27",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.1.32/27",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.0.128/26",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    }
+  ],
+  "skip_token": null,
+  "total_records": 10
+}

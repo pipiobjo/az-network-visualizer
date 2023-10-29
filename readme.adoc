@@ -1,0 +1,192 @@
+= Azure Route Table Visualizer
+
+
+# azure resource graph explorer
+https://portal.azure.com/?feature.customportal=false#view/HubsExtension/ArgQueryBlade/query/Resources%0D%0A%7C%20join%20kind%3Dleftouter%20(ResourceContainers%20%7C%20where%20type%3D%3D'microsoft.resources%2Fsubscriptions'%20%7C%20project%20SubName%3Dname%2C%20subscriptionId)%20on%20subscriptionId%0D%0A%7C%20where%20type%20%3D%3D%20'microsoft.keyvault%2Fvaults'%0D%0A%7C%20project%20type%2C%20name%2C%20SubName
+
+
+[, kusto]
+----
+Resources
+| join kind=leftouter
+( ResourceContainers
+| where type=='microsoft.resources/subscriptions'
+| project VNetSubsciptionName=name, subscriptionId
+) on subscriptionId
+| where type == 'microsoft.network/routetables'
+| extend RoutingTableAssignedSubnet = properties.subnets
+| mv-expand RoutingTableAssignedSubnet
+| extend RoutingTableAssignedSubnetId = tostring(RoutingTableAssignedSubnet.id)
+| extend routes = properties.routes
+| mv-expand routes
+| extend routeAddressPrefix = routes.properties.addressPrefix
+| extend routeNextHopIpAddress = routes.properties.nextHopIpAddress
+| extend routeNextHopType = routes.properties.nextHopType
+| extend routeId = id
+| extend routeName = name
+| join kind=leftouter
+(
+Resources
+| where type == 'microsoft.network/virtualnetworks'
+| extend VNetRange = properties.addressSpace.addressPrefixes
+| mv-expand VNetRange
+| extend Subnet = properties.subnets
+| mv-expand Subnet
+| extend SubnetRange = Subnet.properties.addressPrefix
+| extend SubnetId = tostring(Subnet.id)
+| extend VNetId=id
+| extend VNetSubscriptionId=subscriptionId
+| project VNetId,VNetName=name,VNetRange,SubnetRange,SubnetId
+) on $left.RoutingTableAssignedSubnetId == $right.SubnetId
+| project VNetName,VNetRange,SubnetRange,routeName, routeAddressPrefix, routeNextHopType, routeNextHopIpAddress
+----
+
+
+
+.Via azure cli task
+[, bash]
+----
+
+az graph query -q "Resources
+| join kind=leftouter
+( ResourceContainers
+| where type=='microsoft.resources/subscriptions'
+| project VNetSubsciptionName=name, subscriptionId
+) on subscriptionId
+| where type == 'microsoft.network/routetables'
+| extend RoutingTableAssignedSubnet = properties.subnets
+| mv-expand RoutingTableAssignedSubnet
+| extend RoutingTableAssignedSubnetId = tostring(RoutingTableAssignedSubnet.id)
+| extend routes = properties.routes
+| mv-expand routes
+| extend routeAddressPrefix = routes.properties.addressPrefix
+| extend routeNextHopIpAddress = routes.properties.nextHopIpAddress
+| extend routeNextHopType = routes.properties.nextHopType
+| extend routeId = id
+| extend routeName = name
+| join kind=leftouter
+(
+Resources
+| where type == 'microsoft.network/virtualnetworks'
+| extend VNetRange = properties.addressSpace.addressPrefixes
+| mv-expand VNetRange
+| extend Subnet = properties.subnets
+| mv-expand Subnet
+| extend SubnetRange = Subnet.properties.addressPrefix
+| extend SubnetId = tostring(Subnet.id)
+| extend VNetId=id
+| extend VNetSubscriptionId=subscriptionId
+| project VNetId,VNetName=name,VNetRange,SubnetRange,SubnetId
+) on \$left.RoutingTableAssignedSubnetId == \$right.SubnetId
+| project VNetName,VNetRange,SubnetRange,routeName, routeAddressPrefix, routeNextHopType, routeNextHopIpAddress"
+
+----
+
+
+.Sample Call
+[, bash]
+----
+go run main.go --configFile sample.json | dot -Tpng  > test.png
+----
+
+.sample.json
+[.json]
+----
+{
+  "count": 10,
+  "data": [
+    {
+      "SubnetRange": "10.0.0.0/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-connect-prod-neu-pdy-firewall",
+      "routeNextHopIpAddress": null,
+      "routeNextHopType": "Internet"
+    },
+    {
+      "SubnetRange": "10.0.1.32/27",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "10.0.129.0/24",
+      "routeName": "rt-connect-prod-neu-pdy-gateway",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.0.128/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "10.0.129.0/24",
+      "routeName": "rt-connect-prod-neu-pdy-shared-services",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.0.128/26",
+      "VNetName": "vnet-connect-prod-neu-pdy",
+      "VNetRange": "10.0.0.0/23",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-connect-prod-neu-pdy-shared-services",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.0.128/26",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.128/25",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.1.32/27",
+      "routeName": "rt-corp-nonprod-neu-aks",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "0.0.0.0/0",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.1.32/27",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    },
+    {
+      "SubnetRange": "10.0.129.0/27",
+      "VNetName": "vnet-corp-nonprod-neu",
+      "VNetRange": "10.0.129.0/24",
+      "routeAddressPrefix": "10.0.0.128/26",
+      "routeName": "rt-corp-nonprod-neu-default",
+      "routeNextHopIpAddress": "10.0.0.4",
+      "routeNextHopType": "VirtualAppliance"
+    }
+  ],
+  "skip_token": null,
+  "total_records": 10
+}
+----

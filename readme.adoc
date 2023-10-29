@@ -1,9 +1,13 @@
 = Azure Route Table Visualizer
 
+Simple commandline tool to visualize Azure Route Tables.
+Query Azure Resource Graph for Route Tables and Virtual Networks and create a dot file for graphviz.
 
-# azure resource graph explorer
-https://portal.azure.com/?feature.customportal=false#view/HubsExtension/ArgQueryBlade/query/Resources%0D%0A%7C%20join%20kind%3Dleftouter%20(ResourceContainers%20%7C%20where%20type%3D%3D'microsoft.resources%2Fsubscriptions'%20%7C%20project%20SubName%3Dname%2C%20subscriptionId)%20on%20subscriptionId%0D%0A%7C%20where%20type%20%3D%3D%20'microsoft.keyvault%2Fvaults'%0D%0A%7C%20project%20type%2C%20name%2C%20SubName
+== Usage
 
+
+Open https://resources.azure.com/[azure resource explorer]
+And execute the following query
 
 [, kusto]
 ----
@@ -42,6 +46,7 @@ Resources
 ----
 
 
+Or use the following query in the Azure CLI task
 
 .Via azure cli task
 [, bash]
@@ -82,12 +87,6 @@ Resources
 
 ----
 
-
-.Sample Call
-[, bash]
-----
-go run main.go --configFile sample.json | dot -Tpng  > test.png
-----
 
 .sample.json
 [.json]
@@ -190,3 +189,14 @@ go run main.go --configFile sample.json | dot -Tpng  > test.png
   "total_records": 10
 }
 ----
+
+
+.Sample Call
+[, bash]
+----
+go run main.go --configFile sample.json | dot -Tpng  > sample.png
+----
+
+image::sample.png[]
+
+
